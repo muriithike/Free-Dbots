@@ -1,0 +1,36 @@
+<bot>
+  <name>High Accuracy Bot</name>
+  <indicators>
+    <indicator>
+      <name>RSI</name>
+      <period>14</period>
+    </indicator>
+    <indicator>
+      <name>Moving Average</name>
+      <period>20</period>
+    </indicator>
+    <indicator>
+      <name>Bollinger Bands</name>
+      <period>20</period>
+      <deviation>2</deviation>
+    </indicator>
+  </indicators>
+  <conditions>
+    <condition>
+      <if>RSI < 30 AND Price > Lower Bollinger Band AND Price > Moving Average</if>
+      <action>
+        <type>BUY</type>
+        <take_profit>2</take_profit>
+        <stop_loss>0.05</stop_loss>
+      </action>
+    </condition>
+    <condition>
+      <if>RSI > 70 AND Price < Upper Bollinger Band AND Price < Moving Average</if>
+      <action>
+        <type>SELL</type>
+        <take_profit>2</take_profit>
+        <stop_loss>0.05</stop_loss>
+      </action>
+    </condition>
+  </conditions>
+</bot>
