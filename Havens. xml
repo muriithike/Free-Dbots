@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bot>
+  <name>High Accuracy Bot V2</name>
+  <indicators>
+    <indicator>
+      <name>RSI</name>
+      <period>14</period>
+    </indicator>
+    <indicator>
+      <name>Moving Average</name>
+      <period>20</period>
+    </indicator>
+    <indicator>
+      <name>Bollinger Bands</name>
+      <period>20</period>
+      <deviation>2</deviation>
+    </indicator>
+  </indicators>
+  <variables>
+    <variable>
+      <name>stake</name>
+      <value>0.35</value>
+    </variable>
+    <variable>
+      <name>profit</name>
+      <value>3</value>
+    </variable>
+    <variable>
+      <name>loss</name>
+      <value>1</value>
+    </variable>
+  </variables>
+  <trades>
+    <trade>
+      <condition>
+        <if>RSI &lt; 35 AND Price &gt; BB_Lower AND Price &gt; MA</if>
+      </condition>
+      <type>CALL</type>
+      <stake>stake</stake>
+      <profit>profit</profit>
+      <loss>loss</loss>
+    </trade>
+    <trade>
+      <condition>
+        <if>RSI &gt; 65 AND Price &lt; BB_Upper AND Price &lt; MA</if>
+      </condition>
+      <type>PUT</type>
+      <stake>stake</stake>
+      <profit>profit</profit>
+      <loss>loss</loss>
+    </trade>
+  </trades>
+</bot>
