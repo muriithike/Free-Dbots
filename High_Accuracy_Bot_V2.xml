@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<script>
+    <metadata>
+        <name>Beginner-Friendly ICT Trading Zones</name>
+        <version>5</version>
+        <type>Pine Script</type>
+        <date>2025-03-11</date>
+    </metadata>
+    <content>
+        //@version=5
+        indicator("Beginner-Friendly ICT Trading Zones", overlay=true)
+
+        // === Inputs for Beginners ===
+        timeframe = input.timeframe("D", title="Main Timeframe", options=["D", "240", "60", "15"])
+        show_zones = input.bool(true, title="Show Key Zones?")
+        show_entries = input.bool(true, title="Show Buy/Sell Signals?")
+
+        // === Helper Functions ===
+        // Draws a box on the chart to highlight important areas
+        var box ob_box = na
+        var box liq_box = na
+        draw_box(left_bar, top_price, right_bar, bottom_price, box_color, box_label, box_ref) =>
+            if not na(box_ref)
+                box.delete(box_ref[1])
+            box.new(left=left_bar, top=top_price, right=right_bar, bottom=bottom_price, border_color=box_color, bgcolor=color.new(box_color, 90), text=box_label)
+
+        // === Key Levels from Chosen Timeframe ===
+        // Get daily high and low as our "anchor" levels
+        high_data = request.security(syminfo.tickerid, timeframe, high)
+        low_data = request.security(syminfo.tickerid, timeframe, low)
+        daily_high = high_data[1]
+        daily_low = low_data[1]
+
+        // === Define Simple Zones ===
+        // Order Block: Area above/below a key level where price might reverse
+        ob_top = daily_high
+        ob_bottom = daily_high - (daily_high - daily_low) * 0.2  // 20% below high
+        ob_label = "Order Block (Sell Zone)"
+
+        // Liquidity Zone: Area below key low where stops might be hunted
+        liq_bottom = daily_low
+        liq_top = daily_low + (daily_high - daily_low) * 0.2  // 20% above low
+        liq_label = "Liquidity Zone (Buy Zone)"
+
+        // === Trend Context for Better Entries ===
+        // Simple trend check: Are we above or below the 20-period average?
+        trend_line = ta.sma(close, 20)
+        is_bullish = close > trend_line
+        is_bearish = close < trend_line
+
+        // === Entry Signals ===
+        // Buy: Price dips into Liquidity Zone during an uptrend
+        buy_signal = show_entries and close < liq_top and close > liq_bottom and is_bullish
+        // Sell: Price rises into Order Block during a downtrend
+        sell_signal = show_entries and close > ob_bottom and close < ob_top and is_bearish
+
+        // === Plotting on Chart ===
+        // Draw the key levels
+        plot(daily_high, "Daily High", color=color.red, linewidth=2)
+        plot(daily_low, "Daily Low", color=color.blue, linewidth=2)
+        plot(trend_line, "Trend Line", color=color.gray, style=plot.style_dashed)
+
+        // Draw zones if user wants them
+        if show_zones
+            ob_box := draw_box(bar_index[1], ob_top, bar_index, ob_bottom, color.red, ob_label, ob_box)
+            liq_box := draw_box(bar_index[1], liq_top, bar_index, liq_bottom, color.blue, liq_label, liq_box)
+
+        // Show entry signals with clear labels
+        plotshape(buy_signal, title="Buy", location=location.belowbar, color=color.green, style=shape.triangleup, text="BUY")
+        plotshape(sell_signal, title="Sell", location=location.abovebar, color=color.red, style=shape.triangledown, text="SELL")
+    </content>
+</script>
